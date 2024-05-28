@@ -3,6 +3,7 @@ const testData = require("../db/data/test-data");
 const db = require("../db/connection");
 const request = require("supertest");
 const app = require("../app");
+const endpoints = require("../endpoints.json")
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -13,7 +14,7 @@ describe("general api errors", () => {
       .get("/api/invalidendpoint")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Not Found");
+        expect(body.msg).toBe("Route Not Found");
       });
   });
 });
@@ -24,8 +25,8 @@ describe("/api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        expect(body.length).toBe(3);
-        body.forEach((topic) => {
+        expect(body.topics.length).toBe(3);
+        body.topics.forEach((topic) => {
           expect(typeof topic.slug).toBe("string");
           expect(typeof topic.description).toBe("string");
         });
@@ -39,13 +40,7 @@ describe("/api", () => {
       .get("/api")
       .expect(200)
       .then(({body}) => {
-        for (const endpointName in body.endpoints) {
-          const endpoint = body.endpoints[endpointName]
-          expect(typeof endpoint.description).toBe("string");
-          if(endpoint.exampleResponse) {expect(typeof endpoint.exampleResponse).toBe("object");}
-          if(endpoint.queries) {expect(typeof endpoint.queries).toBe("object");}
-          if(endpoint.bodyFormat) {expect(typeof endpoint.bodyFormat).toBe("object")}
-          }
+        expect(body.endpoints).toEqual(endpoints)
         });
       });
   });
@@ -104,7 +99,7 @@ describe("/api", () => {
             expect(typeof article.article_img_url).toBe("string");
             expect(typeof article.total_comments).toBe("string");
           })
-          expect(body.articles).toBeSortedBy("created_at", { coerce: true });
+          expect(body.articles).toBeSortedBy("created_at", { coerce: true, descending: true });
         });
     });
   });
@@ -124,7 +119,7 @@ describe("/api", () => {
             expect(typeof comment.created_at).toBe("string");
             expect(typeof comment.article_id).toBe("number");
           })
-          expect(body.comments).toBeSortedBy("created_at", { coerce: true });
+          expect(body.comments).toBeSortedBy("created_at", { coerce: true, descending: true });
         });
     });
     test("returns a 404 Not Found when a valid but non-existing id is requested", () => {

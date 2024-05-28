@@ -14,9 +14,9 @@ app.get("/api/articles", getAllArticles)
 app.get("/api/articles/:articleId/comments", getCommentsForArticle)
 
 
-app.use((req, res) => {
-    res.status(404).send({ msg: "Not Found" });
-  });
+app.all('*', (req, res) => {
+  res.status(404).send({msg: "Route Not Found"})
+    })
 
 app.use((err, req, res, next) => {
     if (err.status && err.msg) {

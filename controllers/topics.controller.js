@@ -1,5 +1,5 @@
-
 const { fetchTopics, fetchEndpoints } = require("../models/topics.model");
+
 
 exports.getTopics = (req, res, next) => {
     fetchTopics()
@@ -15,4 +15,5 @@ exports.getEndpoints = (req, res, next) => {
     res.status(200).send(endpoints)
   })
   .catch(next);
-}
+};
+

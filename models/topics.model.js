@@ -1,5 +1,7 @@
 const db = require("../db/connection");
+
 const fs = require("fs/promises")
+
 
 exports.fetchTopics = () => {
 return db.query(`SELECT * FROM topics;`)

@@ -108,3 +108,39 @@ describe("/api", () => {
         });
     });
   });
+
+  describe("/api/articles/:articleId/comments", () => {
+    test("GET:200 sends an array of all comments on the specified article", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments.length).toBe(11);
+          body.comments.forEach((comment) => {
+            expect(typeof comment.comment_id).toBe("number");
+            expect(typeof comment.votes).toBe("number");
+            expect(typeof comment.author).toBe("string");
+            expect(typeof comment.body).toBe("string");
+            expect(typeof comment.created_at).toBe("string");
+            expect(typeof comment.article_id).toBe("number");
+          })
+          expect(body.comments).toBeSortedBy("created_at", { coerce: true });
+        });
+    });
+    test("returns a 404 Not Found when a valid but non-existing id is requested", () => {
+      return request(app)
+        .get("/api/articles/999999/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No Comments Found");
+        });
+    });
+    test("returns a 400 Bad Request when an invalid id is requested", () => {
+      return request(app)
+        .get("/api/articles/banana/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+  });

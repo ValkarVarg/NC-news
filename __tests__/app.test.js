@@ -32,3 +32,20 @@ describe("/api/topics", () => {
       });
   });
 });
+
+describe("/api", () => {
+  test("GET:200 responds with an objects describing all the available endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({body}) => {
+        for (const endpointName in body.endpoints) {
+          const endpoint = body.endpoints[endpointName]
+          expect(typeof endpoint.description).toBe("string");
+          if(endpoint.exampleResponse) {expect(typeof endpoint.exampleResponse).toBe("object");}
+          if(endpoint.queries) {expect(typeof endpoint.queries).toBe("object");}
+          if(endpoint.bodyFormat) {expect(typeof endpoint.bodyFormat).toBe("object")}
+          }
+        });
+      });
+  });

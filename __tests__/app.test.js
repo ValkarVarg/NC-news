@@ -211,3 +211,73 @@ describe("POST /api/articles/:articleId/comments", () => {
       });
   });
 });
+
+describe.only("PATCH /api/articles/:articleId", () => {
+  test("PATCH returns a 200 and the updated article with votes", () => {
+    const votes = {
+      inc_votes: 10,
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(votes)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedArticle).toMatchObject({
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 110,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("PATCH returns a 400 and bad request when insufficient info provided", () => {
+    const votes = {};
+    return request(app)
+      .patch("/api/articles/1")
+      .send(votes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("PATCH returns a 404 and resource not found when article_id doesn't exist", () => {
+    const votes = {
+      inc_votes: 10,
+    };
+    return request(app)
+      .patch("/api/articles/9999999")
+      .send(votes)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Resource Not Found");
+      });
+  });
+  test("PATCH returns a 400 and bad request when article_id invalid", () => {
+    const votes = {
+      inc_votes: 10,
+    };
+    return request(app)
+      .patch("/api/articles/invalidId")
+      .send(votes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("PATCH returns a 400 and bad request when inc_votes is not a number", () => {
+    const votes = {
+      inc_votes: "invalidNumber",
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(votes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+});

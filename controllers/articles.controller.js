@@ -3,6 +3,7 @@ const {
   fetchAllArticles,
   fetchCommentsForArticle,
   postCommentToArticle,
+  updateArticle
 } = require("../models/articles.model");
 
 const {checkExists} = require("../db/seeds/utils.js")
@@ -45,3 +46,14 @@ exports.postComment = (req, res, next) => {
     })
     .catch(next)
 };
+
+exports.patchArticle = (req, res, next) => {
+  const body = req.body
+  const id = req.params.articleId
+  checkExists("articles", "article_id", id)
+  .then(() => updateArticle(body, id))
+  .then((updatedArticle) => {
+    res.status(200).send({ updatedArticle });
+  })
+  .catch(next)
+}

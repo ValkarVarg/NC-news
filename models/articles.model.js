@@ -33,9 +33,14 @@ exports.fetchCommentsForArticle = (id) => {
       [id]
     )
     .then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "No Comments Found" });
-      }
       return rows;
     });
 };
+
+exports.postCommentToArticle = (comment, id) => {
+    const {username, body} = comment;
+    return db.query(`INSERT INTO comments (body, author, article_id)
+    VALUES ($1, $2, $3) RETURNING *;`, [body, username, id])
+    .then (({rows}) => {
+      return rows[0]})
+}

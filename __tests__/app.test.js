@@ -313,3 +313,20 @@ test("returns a 400 Not Found when an invalid id is requested", () => {
     });
 });
 })
+
+describe.only("/api/users", () => {
+  test("GET:200 sends an array of users to the client", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body)
+        expect(body.users.length).toBe(4);
+        body.users.forEach((user) => {
+          expect(typeof user.username).toBe("string");
+          expect(typeof user.name).toBe("string");
+          expect(typeof user.avatar_url).toBe("string");
+        });
+      });
+  });
+});

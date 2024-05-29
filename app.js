@@ -4,6 +4,7 @@ const express = require("express");
 const {getTopics, getEndpoints} = require("./controllers/topics.controller");
 const {getArticle, getAllArticles, getCommentsForArticle, postComment, patchArticle} = require("./controllers/articles.controller")
 const {deleteComment} = require("./controllers/comments.controller");
+const {getUsers} = require("./controllers/users.controller");
 
 const app = express()
 
@@ -15,6 +16,7 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles/:articleId", getArticle)
 app.get("/api/articles", getAllArticles)
 app.get("/api/articles/:articleId/comments", getCommentsForArticle)
+app.get("/api/users", getUsers)
 
 app.post("/api/articles/:articleId/comments", postComment)
 

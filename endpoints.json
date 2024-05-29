@@ -43,8 +43,8 @@
   },
   "GET /api/articles/:articleId/comments": {
     "description": "serves an array of all comments on a specified article, default order by date created",
-    "queries":[],
-    "exampleResponse" : [
+    "queries": [],
+    "exampleResponse": [
       {
         "comment_id": 5,
         "body": "I hate streaming noses",
@@ -66,7 +66,11 @@
   "POST /api/articles/:articleId/comments": {
     "description": "Posts a new comment to specified article and serves the posted comment",
     "queries": [],
-    "exampleResponse" : {
+    "body": {
+      "username": "rogersop",
+      "body": "This is a comment"
+    },
+    "exampleResponse": {
       "comment": {
         "comment_id": 19,
         "body": "This is a comment",
@@ -74,6 +78,25 @@
         "author": "rogersop",
         "votes": 0,
         "created_at": "2024-05-29T11:36:41.910Z"
+      }
+    }
+  },
+  "PATCH /api/articles/:articleId": {
+    "description": "Updates the votes associated with the article by a value provided",
+    "queries": [],
+    "body": {
+      "inc_votes": 10
+    },
+    "exampleResponse": {
+      "updatedArticle": {
+        "article_id": 1,
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": "2020-07-09T20:11:00.000Z",
+        "votes": 110,
+        "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
       }
     }
   }

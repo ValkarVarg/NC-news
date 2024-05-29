@@ -212,7 +212,7 @@ describe("POST /api/articles/:articleId/comments", () => {
   });
 });
 
-describe.only("PATCH /api/articles/:articleId", () => {
+describe("PATCH /api/articles/:articleId", () => {
   test("PATCH returns a 200 and the updated article with votes", () => {
     const votes = {
       inc_votes: 10,
@@ -281,3 +281,35 @@ describe.only("PATCH /api/articles/:articleId", () => {
       });
   });
 });
+
+describe("DELETE /api/comments/:commentId", () => {
+  test("DELETE returns a 204", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then(() => {
+        return request(app)
+          .get("/api/articles/9/comments")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments.length).toBe(1);
+          });
+      });
+  });
+  test("returns a 404 Not Found when a valid but non-existing id is requested", () => {
+    return request(app)
+      .delete("/api/comments/999999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+});
+test("returns a 400 Not Found when an invalid id is requested", () => {
+  return request(app)
+    .delete("/api/comments/invalidId")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Bad Request");
+    });
+});
+})

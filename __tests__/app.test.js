@@ -105,6 +105,44 @@ describe("/api/articles", () => {
         });
       });
   });
+  test("GET:200 Topic query filters the articles based on topic", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(12);
+        body.articles.forEach((article) => {
+          expect(typeof article.author).toBe("string");
+          expect(typeof article.title).toBe("string");
+          expect(typeof article.article_id).toBe("number");
+          expect(typeof article.topic).toBe("string");
+          expect(typeof article.created_at).toBe("string");
+          expect(typeof article.votes).toBe("number");
+          expect(typeof article.article_img_url).toBe("string");
+          expect(typeof article.total_comments).toBe("string");
+        });
+        expect(body.articles).toBeSortedBy("created_at", {
+          coerce: true,
+          descending: true,
+        });
+      });
+  });
+  test("GET:200 Topic query filters to an empty array when given a valid but non-existant query", () => {
+    return request(app)
+      .get("/api/articles?topic=nonexistanttopic")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(0);
+      });
+  });
+  test("returns a 400 Bad Request when an invalid query is requested", () => {
+    return request(app)
+      .get("/api/articles?InvalidQuery=invalidquery")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
 });
 
 describe("/api/articles/:articleId/comments", () => {
@@ -314,7 +352,7 @@ test("returns a 400 Not Found when an invalid id is requested", () => {
 });
 })
 
-describe.only("/api/users", () => {
+describe("/api/users", () => {
   test("GET:200 sends an array of users to the client", () => {
     return request(app)
       .get("/api/users")

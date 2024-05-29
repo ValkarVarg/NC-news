@@ -11,18 +11,33 @@ exports.fetchArticle = (id) => {
     });
 };
 
-exports.fetchAllArticles = () => {
-  return db
-    .query(
-      `SELECT a.author, a.title, a.article_id, a.topic, a.created_at, a.votes, a.article_img_url, COALESCE(COUNT(c.comment_id), 0) AS total_comments
+exports.fetchAllArticles = (query) => {
+
+  const allowedQueries = ["topic"];
+
+  if (query && Object.keys(query).length && !allowedQueries.includes(Object.keys(query)[0])) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+  
+  const queryString = `SELECT a.author, a.title, a.article_id, a.topic, a.created_at, a.votes, a.article_img_url, COALESCE(COUNT(c.comment_id), 0) AS total_comments
     FROM articles a
-    LEFT JOIN comments c ON a.article_id = c.article_id
-    GROUP BY a.article_id
-    ORDER BY a.created_at DESC;`
-    )
+    LEFT JOIN comments c ON a.article_id = c.article_id`;
+  
+  let preparedQuery = queryString;
+  let params = [];
+  
+  if (query && Object.keys(query).length) {
+    const queryKey = Object.keys(query)[0];
+    preparedQuery += ` WHERE ${queryKey} = $1`;
+    params = [query[queryKey]];
+  }
+  
+  preparedQuery += ` GROUP BY a.article_id ORDER BY a.created_at DESC`;
+  
+  return db.query(preparedQuery, params)
     .then(({ rows }) => {
       return rows;
-    });
+    })
 };
 
 exports.fetchCommentsForArticle = (id) => {

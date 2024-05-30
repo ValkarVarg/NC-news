@@ -40,7 +40,14 @@ exports.postComment = (req, res, next) => {
   const body = req.body;
   const id = req.params.articleId;
 
-  checkExists("articles", "article_id", id)
+  if(!req.body.username || !req.body.body) {res.status(400).send({msg : "Bad Request"})}
+  
+  const username = req.body.username
+
+  const checkArticle = checkExists("articles", "article_id", id)
+  const checkUser = checkExists("users", "username", username)
+
+  Promise.all([checkArticle,checkUser])
     .then(() => postCommentToArticle(body, id))
     .then((comment) => {
       res.status(201).send({ comment });

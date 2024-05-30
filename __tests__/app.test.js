@@ -204,10 +204,13 @@ describe("POST /api/articles/:articleId/comments", () => {
       .expect(201)
       .then(({ body }) => {
         expect(body.comment).toMatchObject({
-          body: "This is a comment",
-          author: "rogersop",
-          article_id: 2,
+          "comment_id": 19,
+          "body": "This is a comment",
+          "article_id": 2,
+          "author": "rogersop",
+          "votes": 0,
         });
+        expect(typeof body.comment.created_at).toBe("string")
       });
   });
   test("POST returns a 400 and bad request when insufficient info provided", () => {
@@ -248,6 +251,19 @@ describe("POST /api/articles/:articleId/comments", () => {
         expect(body.msg).toBe("Bad Request");
       });
   });
+  test("POST returns a 404 and resource not found when user doesn't exist", () => {
+    const comment = {
+      username: "MadeUpUser",
+      body: "This is a comment",
+    };
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(comment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Resource Not Found");
+      });
+    });
 });
 
 describe("PATCH /api/articles/:articleId", () => {

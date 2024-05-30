@@ -17,7 +17,7 @@ exports.fetchArticle = (id) => {
 
 exports.fetchAllArticles = (query) => {
 
-  const allowedQueries = ["topic"];
+  const allowedQueries = ["topic", "sort_by", "order"];
 
   if (query && Object.keys(query).length && !allowedQueries.includes(Object.keys(query)[0])) {
     return Promise.reject({ status: 400, msg: "Bad Request" });
@@ -30,13 +30,19 @@ exports.fetchAllArticles = (query) => {
   let preparedQuery = queryString;
   let params = [];
   
-  if (query && Object.keys(query).length) {
+  if (query.topic && Object.keys(query).length) {
     const queryKey = Object.keys(query)[0];
-    preparedQuery += ` WHERE ${queryKey} = $1`;
-    params = [query[queryKey]];
+    preparedQuery += ` WHERE ${queryKey} = $${params.length+1}`;
+    params.push(query[queryKey])
   }
   
-  preparedQuery += ` GROUP BY a.article_id ORDER BY a.created_at DESC`;
+  preparedQuery += ` GROUP BY a.article_id`;
+
+  if (query.sort_by && Object.keys(query).length) {
+    preparedQuery += ` ORDER BY $${params.length+1} DESC`;
+    params.push(query.sort_by);
+  }
+  else{preparedQuery += ` ORDER BY a.created_at DESC`}
   
   return db.query(preparedQuery, params)
     .then(({ rows }) => {

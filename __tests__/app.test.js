@@ -170,6 +170,18 @@ describe("/api/articles", () => {
         expect(body.msg).toBe("Resource Not Found");
       });
   });
+  // test("GET:200 sort_by query sorts the articles by the inputted query", () => {
+  //   return request(app)
+  //     .get("/api/articles?sort_by=votes")
+  //     .expect(200)
+  //     .then(({ body }) => {
+  //       console.log(body.articles)
+  //       expect(body.articles).toBeSortedBy("votes", {
+  //         coerce: true,
+  //         descending: true,
+  //       });
+  // });
+// });
 });
 
 describe("/api/articles/:articleId/comments", () => {

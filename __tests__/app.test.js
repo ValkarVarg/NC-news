@@ -162,14 +162,14 @@ describe("/api/articles", () => {
         expect(body.msg).toBe("Bad Request");
       });
   });
-  // test("returns a 404 Not Found when an topic that doesn't exist is requested", () => {
-  //   return request(app)
-  //     .get("/api/articles?topic=invalidquery")
-  //     .expect(404)
-  //     .then(({ body }) => {
-  //       expect(body.msg).toBe("Resource Not Found");
-  //     });
-  // });
+  test("returns a 404 Not Found when an topic that doesn't exist is requested", () => {
+    return request(app)
+      .get("/api/articles?topic=invalidquery")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Resource Not Found");
+      });
+  });
 });
 
 describe("/api/articles/:articleId/comments", () => {

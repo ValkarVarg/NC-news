@@ -18,7 +18,13 @@ exports.getArticle = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  const query = req.query
+  const query = req.query;
+  if (query.topic) {
+    checkExists("topics", "slug", query.topic)
+      .then(() => {
+      })
+      .catch(next);
+  }
   fetchAllArticles(query)
     .then((articles) => {
       res.status(200).send({ articles });

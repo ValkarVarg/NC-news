@@ -2,7 +2,11 @@ const db = require("../db/connection");
 
 exports.fetchArticle = (id) => {
   return db
-    .query(`SELECT * FROM articles WHERE article_id = $1`, [id])
+    .query(`SELECT a.*, CAST(COUNT(c.comment_id) AS INTEGER) AS total_comments
+    FROM articles a
+    LEFT JOIN comments c ON a.article_id = c.article_id
+    WHERE a.article_id = $1
+    GROUP BY a.article_id;`, [id])
     .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "Not Found" });
@@ -19,7 +23,7 @@ exports.fetchAllArticles = (query) => {
     return Promise.reject({ status: 400, msg: "Bad Request" });
   }
   
-  const queryString = `SELECT a.author, a.title, a.article_id, a.topic, a.created_at, a.votes, a.article_img_url, COALESCE(COUNT(c.comment_id), 0) AS total_comments
+  const queryString = `SELECT a.author, a.title, a.article_id, a.topic, a.created_at, a.votes, a.article_img_url, CAST(COUNT(c.comment_id) AS INTEGER) AS total_comments
     FROM articles a
     LEFT JOIN comments c ON a.article_id = c.article_id`;
   

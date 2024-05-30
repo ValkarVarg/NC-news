@@ -261,6 +261,7 @@ describe("PATCH /api/articles/:articleId", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.updatedArticle).toMatchObject({
+          article_id: 1,
           title: "Living in the shadow of a great man",
           topic: "mitch",
           author: "butter_bridge",
@@ -358,7 +359,6 @@ describe("/api/users", () => {
       .get("/api/users")
       .expect(200)
       .then(({ body }) => {
-        console.log(body)
         expect(body.users.length).toBe(4);
         body.users.forEach((user) => {
           expect(typeof user.username).toBe("string");

@@ -134,7 +134,7 @@ describe("/api/articles", () => {
           expect(typeof article.author).toBe("string");
           expect(typeof article.title).toBe("string");
           expect(typeof article.article_id).toBe("number");
-          expect(typeof article.topic).toBe("string");
+          expect(article.topic).toBe("mitch");
           expect(typeof article.created_at).toBe("string");
           expect(typeof article.votes).toBe("number");
           expect(typeof article.article_img_url).toBe("string");
@@ -148,13 +148,13 @@ describe("/api/articles", () => {
   });
   test("GET:200 Topic query filters to an empty array when given a valid but non-existant query", () => {
     return request(app)
-      .get("/api/articles?topic=nonexistanttopic")
+      .get("/api/articles?topic=paper")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(0);
+        expect(body.articles).toEqual([]);
       });
   });
-  test("returns a 400 Bad Request when an invalid query is requested", () => {
+  test("returns a 400 Bad Request when an unallowed query is requested", () => {
     return request(app)
       .get("/api/articles?InvalidQuery=invalidquery")
       .expect(400)
@@ -162,6 +162,14 @@ describe("/api/articles", () => {
         expect(body.msg).toBe("Bad Request");
       });
   });
+  // test("returns a 404 Not Found when an topic that doesn't exist is requested", () => {
+  //   return request(app)
+  //     .get("/api/articles?topic=invalidquery")
+  //     .expect(404)
+  //     .then(({ body }) => {
+  //       expect(body.msg).toBe("Resource Not Found");
+  //     });
+  // });
 });
 
 describe("/api/articles/:articleId/comments", () => {

@@ -56,7 +56,7 @@ describe("/api/articles/:article_id", () => {
       votes: 100,
       article_img_url:
         "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-      total_comments: 11
+      comment_count: 11
     };
     return request(app)
       .get("/api/articles/1")
@@ -74,7 +74,7 @@ describe("/api/articles/:article_id", () => {
       created_at: "2020-10-16T05:03:00.000Z",
       article_img_url:
         "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-      total_comments: 0
+      comment_count: 0
     };
     return request(app)
       .get("/api/articles/2")
@@ -116,7 +116,7 @@ describe("/api/articles", () => {
           expect(typeof article.created_at).toBe("string");
           expect(typeof article.votes).toBe("number");
           expect(typeof article.article_img_url).toBe("string");
-          expect(typeof article.total_comments).toBe("number");
+          expect(typeof article.comment_count).toBe("number");
         });
         expect(body.articles).toBeSortedBy("created_at", {
           coerce: true,
@@ -138,7 +138,7 @@ describe("/api/articles", () => {
           expect(typeof article.created_at).toBe("string");
           expect(typeof article.votes).toBe("number");
           expect(typeof article.article_img_url).toBe("string");
-          expect(typeof article.total_comments).toBe("number");
+          expect(typeof article.comment_count).toBe("number");
         });
         expect(body.articles).toBeSortedBy("created_at", {
           coerce: true,

@@ -463,7 +463,7 @@ describe("/api/users", () => {
   });
 });
 
-describe.only("/api/users/:username", () => {
+describe("/api/users/:username", () => {
   test("GET:200 sends the chosen user to the client", () => {
     return request(app)
       .get("/api/users/rogersop")

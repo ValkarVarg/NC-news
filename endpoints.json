@@ -101,6 +101,23 @@
       }
     }
   },
+  "PATCH/api/comments/:commentId": {
+    "description": "Updates the votes on a comment by the provided value",
+    "queries": [],
+    "body": {
+      "inc_votes": 10
+    },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 1,
+        "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        "votes": 17,
+        "author": "butter_bridge",
+        "article_id": 9,
+        "created_at": "2020-04-06T12:17:00.000Z"
+      }
+    }
+  },
   "DELETE/api/comments/:commentId": {
     "description": "Deletes the selected comment from the database",
     "queries": []
@@ -127,7 +144,7 @@
     "description": "serves an an object of the selected user",
     "queries": [],
     "exampleResponse": {
-      "users":  {
+      "users": {
         "username": "icellusedkars",
         "name": "sam",
         "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"

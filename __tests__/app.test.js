@@ -469,7 +469,6 @@ describe("/api/users/:username", () => {
       .get("/api/users/rogersop")
       .expect(200)
       .then(({ body }) => {
-        console.log(body)
           expect(body.user.username).toBe("rogersop");
           expect(body.user.name).toBe("paul");
           expect(body.user.avatar_url).toBe('https://avatars2.githubusercontent.com/u/24394918?s=400&v=4');
@@ -484,3 +483,71 @@ describe("/api/users/:username", () => {
           });
       });
   });
+
+  describe("PATCH /api/commentss/:commentId", () => {
+    test("PATCH returns a 200 and the updated comment with votes", () => {
+      const votes = {
+        inc_votes: 1,
+      };
+      return request(app)
+        .patch("/api/comments/1")
+        .send(votes)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comment).toMatchObject({
+            comment_id: 1,
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            votes: 17,
+            author: "butter_bridge",
+            article_id: 9,
+            created_at: "2020-04-06T12:17:00.000Z",
+          });
+        });
+    });
+    test("PATCH returns a 400 and bad request when insufficient info provided", () => {
+      const votes = {};
+      return request(app)
+        .patch("/api/comments/1")
+        .send(votes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test("PATCH returns a 404 and resource not found when article_id doesn't exist", () => {
+      const votes = {
+        inc_votes: 10,
+      };
+      return request(app)
+        .patch("/api/comments/9999999")
+        .send(votes)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Resource Not Found");
+        });
+    });
+    test("PATCH returns a 400 and bad request when comment_id invalid", () => {
+      const votes = {
+        inc_votes: 10,
+      };
+      return request(app)
+        .patch("/api/comments/invalidId")
+        .send(votes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test("PATCH returns a 400 and bad request when inc_votes is not a number", () => {
+      const votes = {
+        inc_votes: "invalidNumber",
+      };
+      return request(app)
+        .patch("/api/comments/1")
+        .send(votes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+  })

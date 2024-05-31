@@ -9,3 +9,13 @@ exports.removeComment = (id) => {
         return result;
       });
   };
+
+exports.updateComment =  (newComment, id) => {
+  const {inc_votes} = newComment;
+  return db.query(`UPDATE comments
+                  SET votes = votes + $1
+                  WHERE comment_id = $2
+                  RETURNING *`, [inc_votes, id])
+  .then (({rows}) => {
+    return rows[0]})
+}

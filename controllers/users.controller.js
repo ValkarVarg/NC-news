@@ -14,7 +14,6 @@ exports.getUsername = (req, res, next) => {
   const param = req.params
   fetchUsername(param)
     .then((user) => {
-      console.log(user)
       res.status(200).send({ user });
     })
     .catch(next);

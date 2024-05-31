@@ -1,6 +1,6 @@
 # Northcoders News API
 
-Link to hosted version: *Include once works*
+Link to hosted version: https://nc-news-k0xf.onrender.com/api
 
 This project allows for API requests to view and update articles, comments, users and topics.
 

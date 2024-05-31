@@ -56,7 +56,7 @@ describe("/api/articles/:article_id", () => {
       votes: 100,
       article_img_url:
         "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-      comment_count: 11
+      comment_count: 11,
     };
     return request(app)
       .get("/api/articles/1")
@@ -74,7 +74,7 @@ describe("/api/articles/:article_id", () => {
       created_at: "2020-10-16T05:03:00.000Z",
       article_img_url:
         "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-      comment_count: 0
+      comment_count: 0,
     };
     return request(app)
       .get("/api/articles/2")
@@ -170,18 +170,57 @@ describe("/api/articles", () => {
         expect(body.msg).toBe("Resource Not Found");
       });
   });
-  // test("GET:200 sort_by query sorts the articles by the inputted query", () => {
-  //   return request(app)
-  //     .get("/api/articles?sort_by=votes")
-  //     .expect(200)
-  //     .then(({ body }) => {
-  //       console.log(body.articles)
-  //       expect(body.articles).toBeSortedBy("votes", {
-  //         coerce: true,
-  //         descending: true,
-  //       });
-  // });
-// });
+  test("GET:200 sort_by query sorts the articles by the inputted query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("votes", {
+          coerce: true,
+          descending: true,
+        });
+      });
+  });
+  test("returns a 400 Bad Request when an column that doesn't exist is sorted by", () => {
+    return request(app)
+      .get("/api/articles?sort_by=invalidColumn")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("GET:200 order query sorts the articles by the inputted query", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", {
+          coerce: true,
+          descending: false,
+        });
+      });
+  });
+  test("returns a 400 Bad Request when ordered by an invalid argument", () => {
+    return request(app)
+      .get("/api/articles?order=invalid")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("GET:200 works with multiple queries", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=votes&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("votes", {
+          coerce: true,
+          descending: false,
+        });
+        body.articles.forEach((article) => {
+        expect(article.topic).toBe("mitch");})
+      });
+  });
 });
 
 describe("/api/articles/:articleId/comments", () => {
@@ -243,13 +282,13 @@ describe("POST /api/articles/:articleId/comments", () => {
       .expect(201)
       .then(({ body }) => {
         expect(body.comment).toMatchObject({
-          "comment_id": 19,
-          "body": "This is a comment",
-          "article_id": 2,
-          "author": "rogersop",
-          "votes": 0,
+          comment_id: 19,
+          body: "This is a comment",
+          article_id: 2,
+          author: "rogersop",
+          votes: 0,
         });
-        expect(typeof body.comment.created_at).toBe("string")
+        expect(typeof body.comment.created_at).toBe("string");
       });
   });
   test("POST returns a 400 and bad request when insufficient info provided", () => {
@@ -302,7 +341,7 @@ describe("POST /api/articles/:articleId/comments", () => {
       .then(({ body }) => {
         expect(body.msg).toBe("Resource Not Found");
       });
-    });
+  });
 });
 
 describe("PATCH /api/articles/:articleId", () => {
@@ -397,16 +436,16 @@ describe("DELETE /api/comments/:commentId", () => {
       .then(({ body }) => {
         expect(body.msg).toBe("Not Found");
       });
+  });
+  test("returns a 400 Not Found when an invalid id is requested", () => {
+    return request(app)
+      .delete("/api/comments/invalidId")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
 });
-test("returns a 400 Not Found when an invalid id is requested", () => {
-  return request(app)
-    .delete("/api/comments/invalidId")
-    .expect(400)
-    .then(({ body }) => {
-      expect(body.msg).toBe("Bad Request");
-    });
-});
-})
 
 describe("/api/users", () => {
   test("GET:200 sends an array of users to the client", () => {

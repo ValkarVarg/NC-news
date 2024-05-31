@@ -437,7 +437,7 @@ describe("DELETE /api/comments/:commentId", () => {
         expect(body.msg).toBe("Not Found");
       });
   });
-  test("returns a 400 Not Found when an invalid id is requested", () => {
+  test("returns a 400 Bad Request when an invalid id is requested", () => {
     return request(app)
       .delete("/api/comments/invalidId")
       .expect(400)
@@ -462,3 +462,25 @@ describe("/api/users", () => {
       });
   });
 });
+
+describe("/api/users/:username", () => {
+  test("GET:200 sends the chosen user to the client", () => {
+    return request(app)
+      .get("/api/users/rogersop")
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body)
+          expect(body.user.username).toBe("rogersop");
+          expect(body.user.name).toBe("paul");
+          expect(body.user.avatar_url).toBe('https://avatars2.githubusercontent.com/u/24394918?s=400&v=4');
+        });
+      });
+      test("returns a 404 Not Found when a non existent username is requested", () => {
+        return request(app)
+          .delete("/api/users/valkarvarg")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Route Not Found");
+          });
+      });
+  });

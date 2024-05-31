@@ -9,9 +9,9 @@ View all : articles, topics, users
 View article by article Id
 View all articles on a specific topic
 View all comments on an article
-Post a comment to an article
+Post: articles and comments
 Delete a comment
-Add or Subtract votes from an article
+Add or Subtract votes from an article or comment
 
 Full details on all endpoints can be found by running a GET /API request.
 

@@ -3,7 +3,8 @@ const {
   fetchAllArticles,
   fetchCommentsForArticle,
   postCommentToArticle,
-  updateArticle
+  updateArticle,
+  postNewArticle
 } = require("../models/articles.model");
 
 const {checkExists} = require("../db/seeds/utils.js")
@@ -71,3 +72,22 @@ exports.patchArticle = (req, res, next) => {
   })
   .catch(next)
 }
+
+exports.postArticle = (req, res, next) => {
+  const body = req.body;
+
+  if(!req.body.author || !req.body.body || !req.body.title || !req.body.topic) {res.status(400).send({msg : "Bad Request"})}
+  
+  const username = req.body.author
+  const topic = req.body.topic
+
+  const checkTopic = checkExists("topics", "slug", topic)
+  const checkUser = checkExists("users", "username", username)
+
+  Promise.all([checkTopic,checkUser])
+    .then(() => postNewArticle(body))
+    .then((article) => {
+      res.status(201).send({ article });
+    })
+    .catch(next)
+};

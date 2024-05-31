@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 
-exports.fetchArticle = (id) => {
+function fetchArticle (id) {
   return db
     .query(`SELECT a.*, CAST(COUNT(c.comment_id) AS INTEGER) AS comment_count
     FROM articles a
@@ -89,3 +89,22 @@ exports.updateArticle = (newArticle, id) => {
   .then (({rows}) => {
     return rows[0]})
 }
+
+exports.postNewArticle = (article) => {
+  const {author, title, body, topic, article_img_url} = article;
+  let queryString = `INSERT INTO articles (author, title, body, topic`
+  if (article_img_url) {queryString += ', article_img_url'}
+  queryString += `) VALUES ($1, $2, $3, $4`
+  if (article_img_url) {queryString += ', $5'}
+  queryString += `) RETURNING *;`
+
+  const params = [author, title, body, topic]
+  if (article_img_url) {params.push(article_img_url)}
+
+  return db.query(queryString, params)
+  .then (({rows}) => {
+    const articleId = rows[0].article_id
+    return fetchArticle(articleId)})
+}
+
+exports.fetchArticle = fetchArticle

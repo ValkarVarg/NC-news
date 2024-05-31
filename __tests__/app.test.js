@@ -551,3 +551,99 @@ describe("/api/users/:username", () => {
         });
     });
   })
+
+  describe("POST /api/articles/", () => {
+    test("POST returns a 201 and the article successfully added", () => {
+      const article = {
+        author: "rogersop",
+        title: "Article",
+        body: "This is an article",
+        topic: "paper",
+        article_img_url: "https://media.istockphoto.com/id/178580846/photo/large-stack-of-papers-on-a-white-background.jpg?s=612x612&w=0&k=20&c=-Ou5GiHRMr3JiXPuH7uHfPrLCgbW15FEYwxEe86se58="
+      };
+      return request(app)
+        .post("/api/articles/")
+        .send(article)
+        .expect(201)
+        .then(({ body }) => {
+          console.log(body)
+          expect(body.article).toMatchObject({
+            article_id: 14,
+            author: "rogersop",
+            title: "Article",
+            body: "This is an article",
+            topic: "paper",
+            votes: 0,
+            comment_count: 0,
+            article_img_url: "https://media.istockphoto.com/id/178580846/photo/large-stack-of-papers-on-a-white-background.jpg?s=612x612&w=0&k=20&c=-Ou5GiHRMr3JiXPuH7uHfPrLCgbW15FEYwxEe86se58="
+          });
+          expect(typeof body.article.created_at).toBe("string");
+        });
+    });
+    test("POST returns a 201 and default vlaue for article_img_url if not provided", () => {
+      const article = {
+        author: "rogersop",
+        title: "Article",
+        body: "This is an article",
+        topic: "paper"
+              };
+      return request(app)
+        .post("/api/articles/")
+        .send(article)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject({
+            article_id: 14,
+            author: "rogersop",
+            title: "Article",
+            body: "This is an article",
+            topic: "paper",
+            votes: 0,
+            comment_count: 0,
+            article_img_url: "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
+          });
+          expect(typeof body.article.created_at).toBe("string");
+        });
+    });
+    test("POST returns a 400 and bad request when insufficient info provided", () => {
+      const article = {
+      };
+      return request(app)
+        .post("/api/articles/")
+        .send(article)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test("POST returns a 404 and Resource Not Found when topic doesn't exist", () => {
+      const article = {
+        author: "rogersop",
+        title: "Article",
+        body: "This is an article",
+        topic: "invalidTopic"
+      };
+      return request(app)
+        .post("/api/articles/")
+        .send(article)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Resource Not Found");
+        });
+    });
+    test("POST returns a 404 and Resource Not Found when user doesn't exist", () => {
+      const article = {
+        author: "madeUpUser",
+        title: "Article",
+        body: "This is an article",
+        topic: "paper"
+      };
+      return request(app)
+        .post("/api/articles/")
+        .send(article)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Resource Not Found");
+        });
+    });
+  });

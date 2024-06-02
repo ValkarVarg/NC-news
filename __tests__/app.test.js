@@ -107,7 +107,7 @@ describe("/api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(13);
+        expect(body.articles.length).toBe(10);
         body.articles.forEach((article) => {
           expect(typeof article.author).toBe("string");
           expect(typeof article.title).toBe("string");
@@ -129,7 +129,7 @@ describe("/api/articles", () => {
       .get("/api/articles?topic=mitch")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(12);
+        expect(body.articles.length).toBe(10);
         body.articles.forEach((article) => {
           expect(typeof article.author).toBe("string");
           expect(typeof article.title).toBe("string");
@@ -221,6 +221,46 @@ describe("/api/articles", () => {
         expect(article.topic).toBe("mitch");})
       });
   });
+  test("GET:200 returns limited based on the limit query", () => {
+    return request(app)
+      .get("/api/articles?limit=12")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(12);
+      });
+    });
+    test("GET:200 returns paged based on p query", () => {
+      return request(app)
+        .get("/api/articles?p=2")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).toBe(3);
+        });
+      });
+      test("GET:200 can combine limit and p", () => {
+        return request(app)
+          .get("/api/articles?limit=4&p=4")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).toBe(1);
+          });
+        });
+        test("GET:200 if limit is not a number, uses default value", () => {
+          return request(app)
+            .get("/api/articles?limit=invalid")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles.length).toBe(10);
+            });
+          });
+          test("GET:200 if page is not a number, uses default value", () => {
+            return request(app)
+              .get("/api/articles?p=invalid")
+              .expect(200)
+              .then(({ body }) => {
+                expect(body.articles.length).toBe(10);
+              });
+            });
 });
 
 describe("/api/articles/:articleId/comments", () => {
@@ -566,7 +606,6 @@ describe("/api/users/:username", () => {
         .send(article)
         .expect(201)
         .then(({ body }) => {
-          console.log(body)
           expect(body.article).toMatchObject({
             article_id: 14,
             author: "rogersop",

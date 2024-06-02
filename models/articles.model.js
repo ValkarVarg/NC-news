@@ -17,10 +17,14 @@ function fetchArticle (id) {
 
 exports.fetchAllArticles = (query) => {
 
-  const allowedQueries = ["topic", "sort_by", "order"];
+  const allowedQueries = ["topic", "sort_by", "order", "limit", "p"];
   const allowedColumns = ["author", "title", "article_id", "topic", "created_at", "votes", "article_img_url", "comment_count"]
   const allowedOrder = ["ASC", "DESC"]
   const order = query.order || 'DESC'
+  const limit = Number(query.limit) || 10
+  const page = query.p - 1 || 0
+
+
   
   if(query.order && !allowedOrder.includes(order.toUpperCase())) {return Promise.reject({ status: 400, msg: "Bad Request" })}
   
@@ -52,7 +56,7 @@ exports.fetchAllArticles = (query) => {
   }
   else{preparedQuery += ` ORDER BY a.created_at`}
 
-  preparedQuery += ` ${order}`
+  preparedQuery += ` ${order} LIMIT ${limit} OFFSET (${page} * ${limit})`
   
   return db.query(preparedQuery, params)
     .then(({ rows }) => {

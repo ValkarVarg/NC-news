@@ -35,8 +35,9 @@ exports.getAllArticles = (req, res, next) => {
 
 exports.getCommentsForArticle = (req, res, next) => {
   const id = req.params.articleId;
+  const queries = req.query
   checkExists("articles", "article_id", id)
-  .then(() => fetchCommentsForArticle(id))
+  .then(() => fetchCommentsForArticle(id, queries))
     .then((comments) => {
       res.status(200).send({ comments });
     })

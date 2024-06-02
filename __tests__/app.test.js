@@ -108,7 +108,7 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.articles.length).toBe(10);
-        expect(body.total_count).toBe(13)
+        expect(body.total_count).toBe(13);
         body.articles.forEach((article) => {
           expect(typeof article.author).toBe("string");
           expect(typeof article.title).toBe("string");
@@ -219,7 +219,8 @@ describe("/api/articles", () => {
           descending: false,
         });
         body.articles.forEach((article) => {
-        expect(article.topic).toBe("mitch");})
+          expect(article.topic).toBe("mitch");
+        });
       });
   });
   test("GET:200 returns limited based on the limit query", () => {
@@ -229,39 +230,39 @@ describe("/api/articles", () => {
       .then(({ body }) => {
         expect(body.articles.length).toBe(12);
       });
-    });
-    test("GET:200 returns paged based on p query", () => {
-      return request(app)
-        .get("/api/articles?p=2")
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.articles.length).toBe(3);
-        });
+  });
+  test("GET:200 returns paged based on p query", () => {
+    return request(app)
+      .get("/api/articles?p=2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(3);
       });
-      test("GET:200 can combine limit and p", () => {
-        return request(app)
-          .get("/api/articles?limit=4&p=4")
-          .expect(200)
-          .then(({ body }) => {
-            expect(body.articles.length).toBe(1);
-          });
-        });
-        test("GET:200 if limit is not a number, uses default value", () => {
-          return request(app)
-            .get("/api/articles?limit=invalid")
-            .expect(200)
-            .then(({ body }) => {
-              expect(body.articles.length).toBe(10);
-            });
-          });
-          test("GET:200 if page is not a number, uses default value", () => {
-            return request(app)
-              .get("/api/articles?p=invalid")
-              .expect(200)
-              .then(({ body }) => {
-                expect(body.articles.length).toBe(10);
-              });
-            });
+  });
+  test("GET:200 can combine limit and p", () => {
+    return request(app)
+      .get("/api/articles?limit=4&p=4")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(1);
+      });
+  });
+  test("GET:200 if limit is not a number, uses default value", () => {
+    return request(app)
+      .get("/api/articles?limit=invalid")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(10);
+      });
+  });
+  test("GET:200 if page is not a number, uses default value", () => {
+    return request(app)
+      .get("/api/articles?p=invalid")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(10);
+      });
+  });
 });
 
 describe("/api/articles/:articleId/comments", () => {
@@ -270,7 +271,7 @@ describe("/api/articles/:articleId/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
-        expect(body.comments.length).toBe(11);
+        expect(body.comments.length).toBe(10);
         body.comments.forEach((comment) => {
           expect(typeof comment.comment_id).toBe("number");
           expect(typeof comment.votes).toBe("number");
@@ -307,6 +308,46 @@ describe("/api/articles/:articleId/comments", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("GET:200 returns limited based on the limit query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(5);
+      });
+  });
+  test("GET:200 returns paged based on p query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(1);
+      });
+  });
+  test("GET:200 can combine limit and p", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5&p=3")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(1);
+      });
+  });
+  test("GET:200 if limit is not a number, uses default value", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=invalid")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(10);
+      });
+  });
+  test("GET:200 if page is not a number, uses default value", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=invalid")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(10);
       });
   });
 });
@@ -510,180 +551,184 @@ describe("/api/users/:username", () => {
       .get("/api/users/rogersop")
       .expect(200)
       .then(({ body }) => {
-          expect(body.user.username).toBe("rogersop");
-          expect(body.user.name).toBe("paul");
-          expect(body.user.avatar_url).toBe('https://avatars2.githubusercontent.com/u/24394918?s=400&v=4');
-        });
-      });
-      test("returns a 404 Not Found when a non existent username is requested", () => {
-        return request(app)
-          .delete("/api/users/valkarvarg")
-          .expect(404)
-          .then(({ body }) => {
-            expect(body.msg).toBe("Route Not Found");
-          });
+        expect(body.user.username).toBe("rogersop");
+        expect(body.user.name).toBe("paul");
+        expect(body.user.avatar_url).toBe(
+          "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+        );
       });
   });
-
-  describe("PATCH /api/commentss/:commentId", () => {
-    test("PATCH returns a 200 and the updated comment with votes", () => {
-      const votes = {
-        inc_votes: 1,
-      };
-      return request(app)
-        .patch("/api/comments/1")
-        .send(votes)
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.comment).toMatchObject({
-            comment_id: 1,
-            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-            votes: 17,
-            author: "butter_bridge",
-            article_id: 9,
-            created_at: "2020-04-06T12:17:00.000Z",
-          });
-        });
-    });
-    test("PATCH returns a 400 and bad request when insufficient info provided", () => {
-      const votes = {};
-      return request(app)
-        .patch("/api/comments/1")
-        .send(votes)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Bad Request");
-        });
-    });
-    test("PATCH returns a 404 and resource not found when article_id doesn't exist", () => {
-      const votes = {
-        inc_votes: 10,
-      };
-      return request(app)
-        .patch("/api/comments/9999999")
-        .send(votes)
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Resource Not Found");
-        });
-    });
-    test("PATCH returns a 400 and bad request when comment_id invalid", () => {
-      const votes = {
-        inc_votes: 10,
-      };
-      return request(app)
-        .patch("/api/comments/invalidId")
-        .send(votes)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Bad Request");
-        });
-    });
-    test("PATCH returns a 400 and bad request when inc_votes is not a number", () => {
-      const votes = {
-        inc_votes: "invalidNumber",
-      };
-      return request(app)
-        .patch("/api/comments/1")
-        .send(votes)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Bad Request");
-        });
-    });
-  })
-
-  describe("POST /api/articles/", () => {
-    test("POST returns a 201 and the article successfully added", () => {
-      const article = {
-        author: "rogersop",
-        title: "Article",
-        body: "This is an article",
-        topic: "paper",
-        article_img_url: "https://media.istockphoto.com/id/178580846/photo/large-stack-of-papers-on-a-white-background.jpg?s=612x612&w=0&k=20&c=-Ou5GiHRMr3JiXPuH7uHfPrLCgbW15FEYwxEe86se58="
-      };
-      return request(app)
-        .post("/api/articles/")
-        .send(article)
-        .expect(201)
-        .then(({ body }) => {
-          expect(body.article).toMatchObject({
-            article_id: 14,
-            author: "rogersop",
-            title: "Article",
-            body: "This is an article",
-            topic: "paper",
-            votes: 0,
-            comment_count: 0,
-            article_img_url: "https://media.istockphoto.com/id/178580846/photo/large-stack-of-papers-on-a-white-background.jpg?s=612x612&w=0&k=20&c=-Ou5GiHRMr3JiXPuH7uHfPrLCgbW15FEYwxEe86se58="
-          });
-          expect(typeof body.article.created_at).toBe("string");
-        });
-    });
-    test("POST returns a 201 and default vlaue for article_img_url if not provided", () => {
-      const article = {
-        author: "rogersop",
-        title: "Article",
-        body: "This is an article",
-        topic: "paper"
-              };
-      return request(app)
-        .post("/api/articles/")
-        .send(article)
-        .expect(201)
-        .then(({ body }) => {
-          expect(body.article).toMatchObject({
-            article_id: 14,
-            author: "rogersop",
-            title: "Article",
-            body: "This is an article",
-            topic: "paper",
-            votes: 0,
-            comment_count: 0,
-            article_img_url: "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
-          });
-          expect(typeof body.article.created_at).toBe("string");
-        });
-    });
-    test("POST returns a 400 and bad request when insufficient info provided", () => {
-      const article = {
-      };
-      return request(app)
-        .post("/api/articles/")
-        .send(article)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Bad Request");
-        });
-    });
-    test("POST returns a 404 and Resource Not Found when topic doesn't exist", () => {
-      const article = {
-        author: "rogersop",
-        title: "Article",
-        body: "This is an article",
-        topic: "invalidTopic"
-      };
-      return request(app)
-        .post("/api/articles/")
-        .send(article)
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Resource Not Found");
-        });
-    });
-    test("POST returns a 404 and Resource Not Found when user doesn't exist", () => {
-      const article = {
-        author: "madeUpUser",
-        title: "Article",
-        body: "This is an article",
-        topic: "paper"
-      };
-      return request(app)
-        .post("/api/articles/")
-        .send(article)
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Resource Not Found");
-        });
-    });
+  test("returns a 404 Not Found when a non existent username is requested", () => {
+    return request(app)
+      .delete("/api/users/valkarvarg")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Route Not Found");
+      });
   });
+});
+
+describe("PATCH /api/commentss/:commentId", () => {
+  test("PATCH returns a 200 and the updated comment with votes", () => {
+    const votes = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(votes)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comment).toMatchObject({
+          comment_id: 1,
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 17,
+          author: "butter_bridge",
+          article_id: 9,
+          created_at: "2020-04-06T12:17:00.000Z",
+        });
+      });
+  });
+  test("PATCH returns a 400 and bad request when insufficient info provided", () => {
+    const votes = {};
+    return request(app)
+      .patch("/api/comments/1")
+      .send(votes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("PATCH returns a 404 and resource not found when article_id doesn't exist", () => {
+    const votes = {
+      inc_votes: 10,
+    };
+    return request(app)
+      .patch("/api/comments/9999999")
+      .send(votes)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Resource Not Found");
+      });
+  });
+  test("PATCH returns a 400 and bad request when comment_id invalid", () => {
+    const votes = {
+      inc_votes: 10,
+    };
+    return request(app)
+      .patch("/api/comments/invalidId")
+      .send(votes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("PATCH returns a 400 and bad request when inc_votes is not a number", () => {
+    const votes = {
+      inc_votes: "invalidNumber",
+    };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(votes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+});
+
+describe("POST /api/articles/", () => {
+  test("POST returns a 201 and the article successfully added", () => {
+    const article = {
+      author: "rogersop",
+      title: "Article",
+      body: "This is an article",
+      topic: "paper",
+      article_img_url:
+        "https://media.istockphoto.com/id/178580846/photo/large-stack-of-papers-on-a-white-background.jpg?s=612x612&w=0&k=20&c=-Ou5GiHRMr3JiXPuH7uHfPrLCgbW15FEYwxEe86se58=",
+    };
+    return request(app)
+      .post("/api/articles/")
+      .send(article)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject({
+          article_id: 14,
+          author: "rogersop",
+          title: "Article",
+          body: "This is an article",
+          topic: "paper",
+          votes: 0,
+          comment_count: 0,
+          article_img_url:
+            "https://media.istockphoto.com/id/178580846/photo/large-stack-of-papers-on-a-white-background.jpg?s=612x612&w=0&k=20&c=-Ou5GiHRMr3JiXPuH7uHfPrLCgbW15FEYwxEe86se58=",
+        });
+        expect(typeof body.article.created_at).toBe("string");
+      });
+  });
+  test("POST returns a 201 and default vlaue for article_img_url if not provided", () => {
+    const article = {
+      author: "rogersop",
+      title: "Article",
+      body: "This is an article",
+      topic: "paper",
+    };
+    return request(app)
+      .post("/api/articles/")
+      .send(article)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject({
+          article_id: 14,
+          author: "rogersop",
+          title: "Article",
+          body: "This is an article",
+          topic: "paper",
+          votes: 0,
+          comment_count: 0,
+          article_img_url:
+            "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700",
+        });
+        expect(typeof body.article.created_at).toBe("string");
+      });
+  });
+  test("POST returns a 400 and bad request when insufficient info provided", () => {
+    const article = {};
+    return request(app)
+      .post("/api/articles/")
+      .send(article)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("POST returns a 404 and Resource Not Found when topic doesn't exist", () => {
+    const article = {
+      author: "rogersop",
+      title: "Article",
+      body: "This is an article",
+      topic: "invalidTopic",
+    };
+    return request(app)
+      .post("/api/articles/")
+      .send(article)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Resource Not Found");
+      });
+  });
+  test("POST returns a 404 and Resource Not Found when user doesn't exist", () => {
+    const article = {
+      author: "madeUpUser",
+      title: "Article",
+      body: "This is an article",
+      topic: "paper",
+    };
+    return request(app)
+      .post("/api/articles/")
+      .send(article)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Resource Not Found");
+      });
+  });
+});

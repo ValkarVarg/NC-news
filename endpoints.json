@@ -140,6 +140,10 @@
       }
     }
   },
+  "DELETE/api/articles/:articleId": {
+    "description": "Deletes the article and all associated comments",
+    "queries": []
+  },
   "PATCH/api/comments/:commentId": {
     "description": "Updates the votes on a comment by the provided value",
     "queries": [],

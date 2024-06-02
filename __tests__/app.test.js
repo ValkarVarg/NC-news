@@ -735,8 +735,8 @@ describe("POST /api/articles/", () => {
 describe("POST /api/topics/", () => {
   test("POST returns a 201 and the topic successfully added", () => {
     const topic = {
-      "slug": "topic name here",
-      "description": "description here"
+      slug: "topic name here",
+      description: "description here",
     };
     return request(app)
       .post("/api/topics/")
@@ -744,8 +744,8 @@ describe("POST /api/topics/", () => {
       .expect(201)
       .then(({ body }) => {
         expect(body.topic).toMatchObject({
-          "slug": "topic name here",
-          "description": "description here"
+          slug: "topic name here",
+          description: "description here",
         });
       });
   });
@@ -759,4 +759,36 @@ describe("POST /api/topics/", () => {
         expect(body.msg).toBe("Bad Request");
       });
   });
-})
+});
+
+describe("DELETE /api/articles/:articleId", () => {
+  test("DELETE returns a 204", () => {
+    return request(app)
+      .delete("/api/articles/1")
+      .expect(204)
+      .then(() => {
+        return request(app)
+          .get("/api/articles/1/")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Not Found");
+          });
+      });
+  });
+  test("returns a 404 Not Found when a valid but non-existing id is requested", () => {
+    return request(app)
+      .delete("/api/articles/999999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Resource Not Found");
+      });
+  });
+  test("returns a 400 Bad Request when an invalid id is requested", () => {
+    return request(app)
+      .delete("/api/articles/invalidId")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+});

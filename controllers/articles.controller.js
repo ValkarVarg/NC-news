@@ -4,7 +4,8 @@ const {
   fetchCommentsForArticle,
   postCommentToArticle,
   updateArticle,
-  postNewArticle
+  postNewArticle,
+  removeArticle
 } = require("../models/articles.model");
 
 const {checkExists} = require("../db/seeds/utils.js")
@@ -92,3 +93,11 @@ exports.postArticle = (req, res, next) => {
     })
     .catch(next)
 };
+
+exports.deleteArticle = (req, res, next) => {
+  const id = req.params.articleId
+  checkExists("articles", "article_id", id)
+  .then (() => {removeArticle(id)})
+  .then(() => {res.status(204).send()})
+  .catch(next)
+}

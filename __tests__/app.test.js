@@ -732,3 +732,31 @@ describe("POST /api/articles/", () => {
       });
   });
 });
+describe("POST /api/topics/", () => {
+  test("POST returns a 201 and the topic successfully added", () => {
+    const topic = {
+      "slug": "topic name here",
+      "description": "description here"
+    };
+    return request(app)
+      .post("/api/topics/")
+      .send(topic)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.topic).toMatchObject({
+          "slug": "topic name here",
+          "description": "description here"
+        });
+      });
+  });
+  test("POST returns a 400 and bad request when insufficient info provided", () => {
+    const topic = {};
+    return request(app)
+      .post("/api/topics/")
+      .send(topic)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+})

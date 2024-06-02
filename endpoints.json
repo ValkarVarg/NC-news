@@ -9,6 +9,20 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+  "POST /api/topics": {
+    "description": "Posts a new topic to the database",
+    "queries": [],
+    "body": {
+      "slug": "topic name here",
+      "description": "description here"
+    },
+    "exampleResponse": {
+      "topic": {
+        "slug": "topic name here",
+        "description": "description here"
+      }
+    }
+  },
   "GET /api/articles": {
     "description": "serves an array of all articles, default order by date created including a total number of comments",
     "queries": ["topic", "sort_by", "order", "limit", "p"],
@@ -75,7 +89,7 @@
       "topic": "paper",
       "article_img_url (optional - defaults if not provided)": "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
     },
-    "exampleResponse":     {
+    "exampleResponse": {
       "article": {
         "article_id": 14,
         "title": "Article",

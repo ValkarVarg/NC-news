@@ -15,16 +15,13 @@ function fetchArticle (id) {
     });
 };
 
-exports.fetchAllArticles = (query) => {
-
+exports.fetchAllArticles = async (query) => {
   const allowedQueries = ["topic", "sort_by", "order", "limit", "p"];
   const allowedColumns = ["author", "title", "article_id", "topic", "created_at", "votes", "article_img_url", "comment_count"]
   const allowedOrder = ["ASC", "DESC"]
   const order = query.order || 'DESC'
   const limit = Number(query.limit) || 10
   const page = query.p - 1 || 0
-
-
   
   if(query.order && !allowedOrder.includes(order.toUpperCase())) {return Promise.reject({ status: 400, msg: "Bad Request" })}
   
@@ -36,32 +33,31 @@ exports.fetchAllArticles = (query) => {
   if (query.sort_by && !allowedColumns.includes(query.sort_by)) {
     return Promise.reject({ status: 400, msg: "Bad Request" })}
   
-  const queryString = `SELECT a.author, a.title, a.article_id, a.topic, a.created_at, a.votes, a.article_img_url, CAST(COUNT(c.comment_id) AS INTEGER) AS comment_count
-    FROM articles a
-    LEFT JOIN comments c ON a.article_id = c.article_id`;
+    const queryString = `
+    WITH article_data AS (
+      SELECT a.author, a.title, a.article_id, a.topic, a.created_at, a.votes, a.article_img_url, CAST(COUNT(c.comment_id) AS INTEGER) AS comment_count
+      FROM articles a
+      LEFT JOIN comments c ON a.article_id = c.article_id
+      ${query.topic ? `WHERE ${Object.keys(query)[0]} = $1` : ''}
+      GROUP BY a.article_id
+      ${query.sort_by ? `ORDER BY a.${query.sort_by}` : `ORDER BY a.created_at`}
+    )
+    SELECT 
+      CAST((SELECT COUNT(*) AS total_count FROM article_data) AS INTEGER) as total_count,
+      json_agg(t.*) as articles
+    FROM (
+      SELECT * FROM article_data
+      LIMIT ${limit} OFFSET (${page} * ${limit})
+    ) AS t
+  `;
+
+  const results = await db.query(queryString, query.topic ? [query[Object.keys(query)[0]]] : []);
   
-  let preparedQuery = queryString;
-  let params = [];
-  
-  if (query.topic && Object.keys(query).length) {
-    const queryKey = Object.keys(query)[0];
-    preparedQuery += ` WHERE ${queryKey} = $${params.length+1}`;
-    params.push(query[queryKey])
+  if (results.rows[0].articles === null) {
+    results.rows[0].articles = [];
   }
   
-  preparedQuery += ` GROUP BY a.article_id`;
-
-  if (query.sort_by && Object.keys(query).length) {
-    preparedQuery += ` ORDER BY a.${query.sort_by}`;
-  }
-  else{preparedQuery += ` ORDER BY a.created_at`}
-
-  preparedQuery += ` ${order} LIMIT ${limit} OFFSET (${page} * ${limit})`
-  
-  return db.query(preparedQuery, params)
-    .then(({ rows }) => {
-      return rows;
-    })
+  return results.rows[0];
 };
 
 exports.fetchCommentsForArticle = (id) => {

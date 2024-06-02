@@ -28,7 +28,7 @@ exports.getAllArticles = (req, res, next) => {
   }
   fetchAllArticles(query)
     .then((articles) => {
-      res.status(200).send({ articles });
+      res.status(200).send(articles);
     })
     .catch(next);
 };

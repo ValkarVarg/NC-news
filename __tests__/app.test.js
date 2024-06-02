@@ -108,6 +108,7 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.articles.length).toBe(10);
+        expect(body.total_count).toBe(13)
         body.articles.forEach((article) => {
           expect(typeof article.author).toBe("string");
           expect(typeof article.title).toBe("string");

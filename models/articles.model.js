@@ -52,22 +52,22 @@ exports.fetchAllArticles = async (query) => {
   }
 
   const queryString = `
-    WITH article_data AS (
-      SELECT a.author, a.title, a.article_id, a.topic, a.created_at, a.votes, a.article_img_url, CAST(COUNT(c.comment_id) AS INTEGER) AS comment_count
-      FROM articles a
-      LEFT JOIN comments c ON a.article_id = c.article_id
-      ${query.topic ? `WHERE ${Object.keys(query)[0]} = $1` : ""}
-      GROUP BY a.article_id
-      ${query.sort_by ? `ORDER BY a.${query.sort_by}` : `ORDER BY a.created_at`}
-    )
-    SELECT 
-      CAST((SELECT COUNT(*) AS total_count FROM article_data) AS INTEGER) as total_count,
-      json_agg(t.*) as articles
-    FROM (
-      SELECT * FROM article_data
-      LIMIT ${limit} OFFSET (${page} * ${limit})
-    ) AS t
-  `;
+  WITH article_data AS (
+    SELECT a.author, a.title, a.article_id, a.topic, a.created_at, a.votes, a.article_img_url, CAST(COUNT(c.comment_id) AS INTEGER) AS comment_count
+    FROM articles a
+    LEFT JOIN comments c ON a.article_id = c.article_id
+    ${query.topic ? `WHERE ${Object.keys(query)[0]} = $1` : ""}
+    GROUP BY a.article_id
+  )
+  SELECT 
+    CAST((SELECT COUNT(*) AS total_count FROM article_data) AS INTEGER) as total_count,
+    json_agg(t.*) as articles
+  FROM (
+    SELECT * FROM article_data
+    ${query.sort_by ? `ORDER BY ${query.sort_by}` : `ORDER BY created_at`}
+    LIMIT ${limit} OFFSET (${page} * ${limit})
+  ) AS t
+`;
 
   const results = await db.query(
     queryString,

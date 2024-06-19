@@ -65,6 +65,7 @@ exports.fetchAllArticles = async (query) => {
   FROM (
     SELECT * FROM article_data
     ${query.sort_by ? `ORDER BY ${query.sort_by}` : `ORDER BY created_at`}
+    ${order}
     LIMIT ${limit} OFFSET (${page} * ${limit})
   ) AS t
 `;
